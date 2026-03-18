@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>안전교육 가다 — 건설기초안전교육 기관 찾기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:       #0669F7;
+  --blue-dim:   #0453C4;
+  --blue-deep:  #0440A0;
+  --blue-glow:  rgba(6, 105, 247, 0.20);
+  --blue-tint:  rgba(6, 105, 247, 0.08);
+  --yellow:     #FFC72C;
+  --yellow-dim: #E6A800;
+  --yellow-glow:rgba(255, 199, 44, 0.20);
+  --yellow-tint:rgba(255, 199, 44, 0.08);
+
+  --bg:         #03070F;
+  --bg2:        #070D1A;
+  --bg3:        #0B1423;
+  --bg4:        #111D30;
+  --border:     rgba(255,255,255,0.06);
+  --border-b:   rgba(6,105,247,0.18);
+  --text:       #E2E8F8;
+  --text-muted: #5A6A8A;
+  --text-dim:   #2A3A58;
+
+  --panel-w:    400px;
+  --topbar-h:   64px;
+}
+
+html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'Pretendard', sans-serif; }
+
+/* ─── Topbar ─────────────────────────────────────────────────────────── */
+#topbar {
+  position:fixed; top:0; left:0; right:0;
+  height:var(--topbar-h);
+  background:rgba(3,7,15,0.95);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border-b);
+  display:flex; align-items:center; padding:0 20px; gap:16px;
+  z-index:100;
+  box-shadow:0 1px 0 rgba(6,105,247,0.12), 0 4px 40px rgba(0,0,0,0.6);
+}
+
+/* Logo */
+.logo { display:flex; align-items:center; gap:6px; text-decoration:none; flex-shrink:0; }
+.logo-service-name { font-family:'Pretendard', sans-serif; font-size:17px; font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:-0.5px; }
+.logo-gada-img { height:28px; width:auto; display:block; filter:brightness(0) invert(1); opacity:0.93; }
+
+.v-divider { width:1px; height:30px; background:var(--border); flex-shrink:0; }
+
+/* Search */
+.search-wrap { flex:1; max-width:320px; position:relative; }
+.search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:15px; height:15px; stroke:var(--text-muted); fill:none; stroke-width:2; pointer-events:none; }
+#searchInput {
+  width:100%;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 12px 9px 36px;
+  font-family:'Pretendard', sans-serif;
+  font-size:14px; color:var(--text); outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+#searchInput::placeholder { color:var(--text-muted); }
+#searchInput:focus { border-color:var(--blue); background:var(--bg4); box-shadow:0 0 0 3px var(--blue-glow); }
+
+/* Stats */
+.topbar-stats { margin-left:auto; margin-right:4px; display:flex; align-items:center; gap:24px; }
+.stat-item { display:flex; flex-direction:column; align-items:flex-end; }
+.stat-num { font-family:'Pretendard', sans-serif; font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+.stat-num.blue  { color:var(--blue); }
+.stat-num.yellow{ color:var(--yellow); }
+.stat-label { font-family:'Pretendard', sans-serif; font-size:11px; color:var(--text-muted); letter-spacing:0.5px; margin-top:2px; font-weight:500; }
+
+/* Locate Button */
+#locateBtn {
+  display:flex; align-items:center; gap:8px;
+  padding:9px 18px;
+  background:var(--blue);
+  border:none; border-radius:10px;
+  color:white; font-family:'Pretendard', sans-serif;
+  font-size:14px; font-weight:600;
+  cursor:pointer; white-space:nowrap;
+  box-shadow:0 4px 20px rgba(6,105,247,0.4);
+  transition:background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+#locateBtn:hover { background:var(--blue-dim); box-shadow:0 6px 28px rgba(6,105,247,0.55); }
+#locateBtn:active { transform:scale(0.97); }
+#locateBtn svg { width:14px; height:14px; stroke:white; fill:none; stroke-width:2.5; flex-shrink:0; }
+#locateBtn.locating svg { animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ─── Side Panel ──────────────────────────────────────────────────────── */
+/* ─── Side Panel ─────────────────────────────────────────────────────── */
+#panel {
+  position:fixed; top:var(--topbar-h); left:0;
+  width:var(--panel-w);
+  height:calc(100vh - var(--topbar-h));
+  background:var(--bg2);
+  border-right:1px solid var(--border-b);
+  display:flex; flex-direction:column;
+  z-index:50;
+  box-shadow:6px 0 40px rgba(0,0,0,0.5);
+  transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Panel top accent line */
+#panel::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--blue) 0%, var(--yellow) 100%);
+}
+
+/* Filters */
+.panel-filters { padding:16px 16px 14px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:13px; }
+
+.filter-row { display:flex; align-items:center; gap:10px; }
+.filter-label { font-size:12px; color:var(--text-muted); letter-spacing:0.3px; white-space:nowrap; width:44px; flex-shrink:0; font-family:'Pretendard',sans-serif; font-weight:600; }
+
+.filter-chips { display:flex; gap:5px; flex-wrap:wrap; }
+.chip {
+  padding:4px 11px; border-radius:6px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text-muted);
+  font-family:'Pretendard', sans-serif;
+  font-size:12px; font-weight:500; cursor:pointer;
+  transition:all 0.15s; white-space:nowrap;
+}
+.chip:hover { border-color:var(--blue); color:var(--text); background:var(--blue-tint); }
+.chip.active { background:var(--blue); border-color:var(--blue); color:white; }
+
+/* Grade chips: SS/S use yellow accent */
+.chip[data-grade="평가면제(2년연속S)"].active,
+.chip[data-grade="S등급"].active {
+  background:var(--yellow); border-color:var(--yellow); color:#03070F;
+}
+.chip[data-grade="평가면제(2년연속S)"]:hover,
+.chip[data-grade="S등급"]:hover { border-color:var(--yellow); color:var(--yellow); background:var(--yellow-tint); }
+
+/* Distance slider */
+.dist-row { display:flex; align-items:center; gap:10px; }
+.dist-slider-wrap { flex:1; position:relative; }
+#distSlider {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:3px;
+  border-radius:2px; outline:none; cursor:pointer;
+  background:linear-gradient(to right, var(--yellow) 0%, var(--yellow) var(--pct, 29%), var(--bg4) var(--pct, 29%), var(--bg4) 100%);
+}
+#distSlider::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--yellow);
+  box-shadow:0 0 10px var(--yellow-glow);
+  cursor:pointer;
+}
+#distVal { font-family:'Pretendard',sans-serif; font-size:14px; font-weight:700; color:var(--yellow); white-space:nowrap; min-width:50px; text-align:right; font-variant-numeric:tabular-nums; }
+
+/* Results */
+.panel-header {
+  padding:12px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.panel-header-title { font-family:'Pretendard',sans-serif; font-size:12px; font-weight:600; color:var(--text-muted); letter-spacing:0.3px; }
+.result-badge {
+  display:flex; align-items:center; gap:6px;
+}
+#resultCount { font-family:'Pretendard',sans-serif; font-size:15px; font-weight:700; color:var(--blue); font-variant-numeric:tabular-nums; }
+.result-unit { font-size:12px; color:var(--text-muted); }
+
+#resultsList { flex:1; overflow-y:auto; padding:8px 8px; }
+#resultsList::-webkit-scrollbar { width:3px; }
+#resultsList::-webkit-scrollbar-track { background:transparent; }
+#resultsList::-webkit-scrollbar-thumb { background:var(--bg4); border-radius:2px; }
+
+/* Result card */
+.result-card {
+  padding:13px 14px 11px;
+  border-radius:10px;
+  border:1px solid transparent;
+  cursor:pointer; margin-bottom:4px;
+  transition:all 0.15s; position:relative;
+}
+.result-card:hover { background:var(--bg3); border-color:var(--border-b); }
+.result-card.active { background:var(--blue-tint); border-color:rgba(6,105,247,0.35); }
+.result-card .rank { display:none; }
+.card-top { display:flex; align-items:flex-start; gap:8px; margin-bottom:7px; }
+.card-name { font-size:15px; font-weight:600; color:var(--text); line-height:1.35; flex:1; }
+.grade-badge {
+  font-family:'Pretendard',sans-serif; font-size:11px; font-weight:700;
+  padding:3px 8px; border-radius:5px; white-space:nowrap; flex-shrink:0; margin-top:1px; letter-spacing:-0.2px;
+}
+.card-meta { display:flex; flex-direction:column; gap:5px; }
+.card-row { display:flex; align-items:flex-start; gap:7px; font-size:13px; color:var(--text-muted); line-height:1.5; }
+.card-row svg { width:13px; height:13px; flex-shrink:0; stroke:var(--text-dim); fill:none; stroke-width:2; margin-top:2px; }
+.card-dist { font-family:'Pretendard',sans-serif; font-size:13px; font-weight:700; color:var(--yellow); margin-top:8px; display:flex; align-items:center; gap:5px; font-variant-numeric:tabular-nums; }
+.card-dist::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--yellow); }
+
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:200px; gap:12px; color:var(--text-muted); font-size:14px; text-align:center; padding:20px; }
+.empty-state svg { width:38px; height:38px; stroke:var(--text-dim); fill:none; stroke-width:1.5; opacity:0.6; }
+
+/* ─── Map ─────────────────────────────────────────────────────────────── */
+#mapWrap { position:fixed; top:var(--topbar-h); left:var(--panel-w); right:0; bottom:0; }
+#map { width:100%; height:100%; }
+
+/* ─── Info Popup ──────────────────────────────────────────────────────── */
+.info-popup {
+  background:var(--bg2);
+  border:1px solid var(--border-b);
+  border-radius:18px;
+  padding:22px 20px 20px;
+  width:100%; max-width:340px; min-width:0; box-sizing:border-box;
+  box-shadow:0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(6,105,247,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+  font-family:'Pretendard', sans-serif;
+  position:relative; overflow:hidden;
+}
+@media (max-width: 520px) {
+  .info-popup { padding:18px 16px 16px; border-radius:14px; }
+  .info-name { font-size:16px; }
+  .info-row { font-size:13px; }
+  .info-btn { font-size:14px; padding:13px 10px; }
+  .info-btn-gada { padding:13px 14px; }
+  .info-btn-gada-logo { height:18px; }
+  .info-btn-gada-text { font-size:15px; }
+}
+.info-popup::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--blue) 0%, var(--yellow) 100%);
+}
+.info-name { font-size:18px; font-weight:700; color:#fff; margin-bottom:12px; line-height:1.4; padding-right:8px; }
+.info-badges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.info-badge { font-family:'Pretendard',sans-serif; font-size:13px; padding:4px 10px; border-radius:6px; font-weight:700; letter-spacing:-0.2px; }
+.info-row { display:flex; align-items:flex-start; gap:10px; font-size:15px; color:#7A8AAA; margin-bottom:9px; line-height:1.55; }
+.info-icon { flex-shrink:0; font-size:15px; margin-top:1px; }
+.info-dist { display:flex; align-items:center; gap:8px; font-family:'Pretendard',sans-serif; font-size:16px; font-weight:700; color:var(--yellow); margin:12px 0; padding:10px 14px; background:var(--yellow-tint); border-radius:10px; border:1px solid rgba(255,199,44,0.2); font-variant-numeric:tabular-nums; }
+.info-dist::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--yellow); flex-shrink:0; }
+.info-actions { display:flex; gap:8px; margin-top:16px; }
+.info-btn { flex:1; padding:13px 10px; border-radius:11px; border:none; font-family:'Pretendard',sans-serif; font-size:14px; font-weight:600; cursor:pointer; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:5px; transition:background 0.18s, color 0.18s, transform 0.12s, box-shadow 0.18s; }
+.info-btn:active { transform:scale(0.96); }
+.info-btn.primary { background:var(--blue); color:white; box-shadow:0 4px 16px rgba(6,105,247,0.35); }
+.info-btn.primary:hover { background:#1478FF; box-shadow:0 6px 24px rgba(6,105,247,0.6); transform:translateY(-2px); }
+.info-btn.secondary { background:var(--bg3); color:var(--text); border:1px solid var(--border); }
+.info-btn.secondary:hover { background:var(--bg4); border-color:rgba(255,255,255,0.2); color:#fff; transform:translateY(-2px); box-shadow:0 4px 14px rgba(0,0,0,0.3); }
+.info-btn-gada {
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  width:100%; margin-top:10px; padding:14px 16px;
+  background:var(--yellow); border:none; border-radius:12px;
+  font-family:'Pretendard',sans-serif;
+  color:#0A1020; cursor:pointer; text-decoration:none;
+  box-shadow:0 4px 18px rgba(255,199,44,0.35);
+  transition:background 0.18s, transform 0.12s, box-shadow 0.18s;
+}
+.info-btn-gada:hover { background:#FFD55A; transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,199,44,0.6); }
+.info-btn-gada:active { transform:scale(0.97); }
+.info-btn-gada-top { font-size:11px; font-weight:500; color:#0A1020; opacity:0.65; letter-spacing:0.2px; }
+.info-btn-gada-bottom { display:flex; align-items:center; gap:6px; }
+.info-btn-gada-logo { height:20px; width:auto; display:block; filter:brightness(0); }
+.info-btn-gada-text { font-size:16px; font-weight:800; color:#0A1020; white-space:nowrap; letter-spacing:-0.3px; }
+
+/* ─── Loading Overlay ─────────────────────────────────────────────────── */
+#loadingOverlay {
+  position:fixed; inset:0; background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:0; z-index:999; transition:opacity 0.5s;
+}
+.loader-emblem {
+  width:80px; height:80px;
+  background:linear-gradient(135deg, var(--blue) 0%, var(--blue-deep) 100%);
+  border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 60px rgba(6,105,247,0.4);
+  margin-bottom:28px;
+  animation:emblem-in 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  position:relative; overflow:hidden;
+}
+.loader-emblem::before {
+  content:'⛑'; font-size:36px; position:relative; z-index:1;
+}
+.loader-emblem::after {
+  content:''; position:absolute; inset:0;
+  background:conic-gradient(from 0deg, transparent, rgba(255,199,44,0.3), transparent 120deg);
+  animation:spin-conic 2s linear infinite;
+}
+@keyframes emblem-in { from { opacity:0; transform:scale(0.6) rotate(-10deg); } }
+.loader-title {
+  font-family:'Pretendard',sans-serif;
+  font-size:36px; font-weight:800; letter-spacing:-1px; color:var(--text);
+  opacity:0; animation:fade-up 0.5s forwards 0.4s;
+  margin-bottom:6px;
+}
+.loader-title span { color:var(--yellow); }
+.loader-sub {
+  font-family:'Pretendard',sans-serif; font-size:12px; font-weight:500; color:var(--text-muted);
+  letter-spacing:0.5px; opacity:0; animation:fade-up 0.5s forwards 0.6s;
+  margin-bottom:32px;
+}
+.loader-track { width:220px; height:3px; background:var(--bg3); border-radius:2px; overflow:hidden; opacity:0; animation:fade-up 0.5s forwards 0.7s; }
+.loader-fill { height:100%; width:0; border-radius:2px; background:linear-gradient(90deg, var(--blue), var(--yellow)); animation:load-fill 1.6s ease-out forwards 0.8s; }
+@keyframes load-fill { to { width:100%; } }
+@keyframes fade-up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── No-location Banner ──────────────────────────────────────────────── */
+#noloc-banner {
+  position:fixed; bottom:24px; left:calc(var(--panel-w) + 20px);
+  background:var(--bg2); border-radius:12px;
+  padding:14px 18px; display:flex; align-items:center; gap:14px; z-index:200;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5); max-width:380px;
+  animation:slide-up 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+#noloc-banner.type-error { border:1px solid rgba(255,80,80,0.4); }
+#noloc-banner.type-info  { border:1px solid rgba(6,105,247,0.3); }
+@keyframes slide-up { from { opacity:0; transform:translateY(16px); } }
+#noloc-banner.hide { animation:slide-down 0.3s forwards; }
+@keyframes slide-down { to { opacity:0; transform:translateY(16px); } }
+.noloc-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.type-error .noloc-dot { background:#FF5050; box-shadow:0 0 10px rgba(255,80,80,0.4); }
+.type-info  .noloc-dot { background:var(--blue); box-shadow:0 0 10px var(--blue-glow); }
+.noloc-text { font-family:'Pretendard',sans-serif; font-size:13px; color:var(--text-muted); line-height:1.5; }
+.noloc-text strong { display:block; margin-bottom:2px; font-size:14px; font-weight:600; }
+.type-error .noloc-text strong { color:#FF8080; }
+.type-info  .noloc-text strong { color:var(--text); }
+#noloc-banner button { margin-left:auto; flex-shrink:0; background:transparent; border:none; color:var(--text-muted); font-size:16px; cursor:pointer; padding:4px; }
+
+/* ─── Location Consent Modal ──────────────────────────────────────────── */
+#locConsent {
+  display:none; position:fixed; inset:0; z-index:500;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.65); backdrop-filter:blur(6px);
+}
+#locConsent.show { display:flex; }
+#locConsentBox {
+  background:var(--bg2); border:1px solid var(--border-b); border-radius:20px;
+  padding:32px 28px; max-width:360px; width:calc(100% - 40px);
+  box-shadow:0 24px 80px rgba(0,0,0,0.7);
+  animation:fade-up 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+#locConsentBox .lc-icon {
+  width:52px; height:52px; border-radius:14px;
+  background:var(--blue-tint); border:1px solid var(--border-b);
+  display:flex; align-items:center; justify-content:center; margin-bottom:20px;
+}
+#locConsentBox .lc-icon svg { width:26px; height:26px; stroke:var(--blue); fill:none; stroke-width:1.8; stroke-linecap:round; }
+#locConsentBox h3 { font-size:18px; font-weight:700; color:var(--text); margin-bottom:10px; }
+#locConsentBox p  { font-size:14px; color:var(--text-muted); line-height:1.7; margin-bottom:8px; }
+#locConsentBox .lc-note {
+  font-size:12px; color:var(--text-dim); line-height:1.6;
+  background:var(--bg3); border-radius:8px; padding:10px 12px; margin:16px 0 24px;
+}
+#locConsentBox .lc-btns { display:flex; gap:10px; }
+#locConsentBox .lc-allow {
+  flex:1; padding:13px; border:none; border-radius:12px;
+  background:var(--blue); color:#fff; font-family:'Pretendard',sans-serif;
+  font-size:15px; font-weight:700; cursor:pointer;
+  transition:background 0.15s;
+}
+#locConsentBox .lc-allow:hover { background:var(--blue-dim); }
+#locConsentBox .lc-deny {
+  padding:13px 18px; border:1px solid var(--border); border-radius:12px;
+  background:transparent; color:var(--text-muted); font-family:'Pretendard',sans-serif;
+  font-size:15px; cursor:pointer; transition:border-color 0.15s;
+}
+#locConsentBox .lc-deny:hover { border-color:var(--text-muted); }
+
+/* ─── 기관 찾기 버튼 (공통) ───────────────────────────────────────────── */
+#findBtn {
+  display:flex; align-items:center; gap:7px;
+  padding:9px 16px;
+  background:var(--yellow); border:none; border-radius:10px;
+  color:#0A1020; font-family:'Pretendard',sans-serif;
+  font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+  box-shadow:0 4px 16px rgba(255,199,44,0.35);
+  transition:background 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+#findBtn:hover { background:#FFD55A; box-shadow:0 6px 22px rgba(255,199,44,0.5); transform:translateY(-1px); }
+#findBtn:active { transform:scale(0.97); }
+#findBtn svg { width:14px; height:14px; stroke:#0A1020; fill:none; stroke-width:2.2; flex-shrink:0; }
+#findBtn .find-count { font-size:12px; font-weight:800; color:#0A1020; font-variant-numeric:tabular-nums; opacity:0.7; }
+
+/* ─── 패널 헤더 ───────────────────────────────────────────────────────── */
+.panel-header-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 18px 14px; flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+.panel-header-bar .panel-title {
+  font-size:16px; font-weight:700; color:var(--text); letter-spacing:-0.3px;
+}
+.panel-header-bar .panel-close-btn {
+  display:flex; align-items:center; justify-content:center;
+  width:32px; height:32px; border-radius:50%;
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--text-muted); font-size:17px; cursor:pointer;
+  transition:background 0.15s, color 0.15s;
+}
+.panel-header-bar .panel-close-btn:hover { background:var(--bg4); color:var(--text); }
+
+/* ─── 백드롭 ──────────────────────────────────────────────────────────── */
+#panelBackdrop {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.55); z-index:199;
+  backdrop-filter:blur(3px);
+  animation:fade-in 0.22s;
+}
+#panelBackdrop.show { display:block; }
+@keyframes fade-in { from { opacity:0; } to { opacity:1; } }
+
+/* ─── Desktop: 패널 항상 표시 ────────────────────────────────────────── */
+@media (min-width: 769px) {
+  #mapWrap { left:var(--panel-w); }
+  #findBtn { display:none; }
+  .panel-header-bar { display:none; }
+  #panelBackdrop { display:none !important; }
+}
+
+/* ─── Mobile: 패널 숨김 → 버튼으로 진입 ─────────────────────────────── */
+@media (max-width: 768px) {
+  :root { --panel-w:0px; }
+  #mapWrap { left:0; }
+  #panel {
+    top:auto; bottom:0; left:0; right:0;
+    width:100vw; max-width:100vw; height:92vh;
+    border-radius:20px 20px 0 0;
+    border-right:none; border-top:1px solid var(--border-b);
+    box-shadow:0 -12px 48px rgba(0,0,0,0.65);
+    transform:translateY(110%); z-index:200;
+  }
+  #panel.open { transform:translateY(0); }
+  #panel::before { border-radius:2px 2px 0 0; }
+  .topbar-stats { display:none; }
+  .v-divider { display:none; }
+  .search-wrap { display:none; }
+  #topbar { gap:8px; padding:0 12px; }
+  #findBtn { margin-left:auto; display:flex; }
+  #locateBtn { padding:9px 14px; font-size:12px; }
+  #locateBtn svg { width:13px; height:13px; }
+  .panel-header-bar { padding:16px 16px 12px; }
+}
+
+#menuToggle { display:none; }
+#listBtn { display:none; }
+#panelClose { display:none; }
+.panel-drag-handle { display:none; }
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loadingOverlay">
+  <div class="loader-emblem"></div>
+  <div class="loader-title">GADA <span>SAFETY</span></div>
+  <div class="loader-sub">건설기초안전교육 기관 탐색기</div>
+  <div class="loader-track"><div class="loader-fill"></div></div>
+</div>
+
+<!-- Topbar -->
+<div id="topbar">
+  <button id="menuToggle">☰</button>
+  <a class="logo" href="#">
+    <span class="logo-service-name">안전교육</span>
+    <img class="logo-gada-img" src="gada-logo.png" alt="가다">
+  </a>
+  <div class="v-divider"></div>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="searchInput" type="text" placeholder="기관명으로 검색..." autocomplete="off">
+  </div>
+  <div class="topbar-stats">
+    <div class="stat-item">
+      <div class="stat-num blue" id="statTotal">71</div>
+      <div class="stat-label">전체 기관</div>
+    </div>
+    <div class="v-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num yellow" id="statNearby">—</div>
+      <div class="stat-label">주변 기관</div>
+    </div>
+  </div>
+  <button id="findBtn" onclick="openPanel()">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    기관 찾기 <span class="find-count" id="findBtnCount">71</span>
+  </button>
+  <button id="locateBtn">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="9"/></svg>
+    내 위치 찾기
+  </button>
+</div>
+
+<!-- Panel backdrop -->
+<div id="panelBackdrop" onclick="closePanel()"></div>
+
+<!-- Location consent modal -->
+<div id="locConsent">
+  <div id="locConsentBox">
+    <div class="lc-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="9"/></svg>
+    </div>
+    <h3>위치 정보 사용 안내</h3>
+    <p>가장 가까운 건설기초안전교육 기관을 찾기 위해 현재 위치가 필요합니다.</p>
+    <div class="lc-note">
+      📍 위치 정보는 가까운 교육기관 탐색 목적으로만 사용되며,<br>
+      서버에 저장되거나 제3자에게 제공되지 않습니다.
+    </div>
+    <div class="lc-btns">
+      <button class="lc-allow" id="lcAllow">위치 허용하기</button>
+      <button class="lc-deny"  id="lcDeny">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel -->
+<div id="panel">
+  <div class="panel-header-bar">
+    <span class="panel-title">기관 찾기</span>
+    <button class="panel-close-btn" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-filters">
+    <div class="filter-row">
+      <span class="filter-label">등급</span>
+      <div class="filter-chips" id="gradeFilter">
+        <button class="chip active" data-grade="all">전체</button>
+        <button class="chip" data-grade="평가면제(2년연속S)">SS</button>
+        <button class="chip" data-grade="S등급">S</button>
+        <button class="chip" data-grade="A등급">A</button>
+        <button class="chip" data-grade="B등급">B</button>
+        <button class="chip" data-grade="C등급">C</button>
+        <button class="chip" data-grade="D등급">D</button>
+        <button class="chip" data-grade="신규">신규</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">외국어</span>
+      <div class="filter-chips" id="frgFilter">
+        <button class="chip active" data-frg="all">전체</button>
+        <button class="chip" data-frg="참여">참여</button>
+        <button class="chip" data-frg="미참여">미참여</button>
+      </div>
+    </div>
+    <div class="filter-row dist-row">
+      <span class="filter-label">반경</span>
+      <div class="dist-slider-wrap">
+        <input type="range" id="distSlider" min="1" max="100" value="30" step="1">
+      </div>
+      <div id="distVal">30 km</div>
+    </div>
+  </div>
+
+  <div class="panel-header">
+    <span class="panel-header-title">INSTITUTIONS</span>
+    <div class="result-badge">
+      <span id="resultCount">71</span>
+      <span class="result-unit">개 기관</span>
+    </div>
+  </div>
+
+  <div id="resultsList"></div>
+</div>
+
+<!-- Map -->
+<div id="mapWrap"><div id="map"></div></div>
+
+<script>
+// ─── Data ──────────────────────────────────────────────────────────────────
+const INSTITUTIONS = [{"name":"(주)안전누리","region":"인천·경기","address":"경기도 고양시 일산서구 중앙로 1455 대우시티프라자 2층 219호","phone":"031-979-6087","website":"http://건설기초안전보건교육.kr/","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2014_1000003018","lat":37.6708667,"lng":126.7585144},{"name":"주식회사건설기초안전교육구리지사","region":"인천·경기","address":"경기도 구리시 검배로 5 5층","phone":"031-523-2254","website":"https://www.gcsmc.co.kr","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2023_1000032006","lat":37.6006377,"lng":127.1420589},{"name":"(주)포항건설안전교육원","region":"대구·경북","address":"경상북도 포항시 남구 중흥로 94 5층","phone":"054-285-1254","website":"http://pcse.co.kr","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2016_1000004174","lat":36.0133077,"lng":129.3509805},{"name":"(주)대한창조안전원","region":"부산·경남","address":"부산광역시 동구 범일로102번길 14 , 8층 (범일동)","phone":"051-635-7800","website":"http://kcsht.co.kr/","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2014_1000003251","lat":35.1388548,"lng":129.0609933},{"name":"부산안전교육 주식회사","region":"부산·경남","address":"부산광역시 부산진구 중앙대로756번길 17 , 2층 2층 (부전동)","phone":"051-717-3184","website":"http://bssafe.kr/","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2016_1000004052","lat":35.159465,"lng":129.0617167},{"name":"주식회사 건설기초안전교육","region":"서울·강원","address":"서울특별시 동대문구 천호대로 17 5층","phone":"02-2135-5060","website":"https://www.scsmc.co.kr","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2020_1000029814","lat":37.5748805,"lng":127.0254797},{"name":"(주)한국기초안전협회","region":"대전·충청","address":"충청북도 청주시 흥덕구 가로수로1154번길 5-16 (강서동, 청주강서동우체국)","phone":"043-903-3980","website":"http://korsea.co.kr","frgEdu":"참여","status":"정상","grade":"S등급","mgmtNo":"2014_1000003236","lat":36.6261294,"lng":127.4258413},{"name":"(주)미래건설안전컨설팅","region":"부산·경남","address":"경상남도 창원시 성산구 중앙대로 56 (상남동, 양지빌딩)","phone":"055-263-6391","website":"http://www.safetyedu.kr","frgEdu":"참여","status":"정상","grade":"평가면제(2년연속S)","mgmtNo":"2014_1000003008","lat":35.2198363,"lng":128.6777176},{"name":"(주)대한안전교육원","region":"대구·경북","address":"대구광역시 수성구 고산로 98(신매동, 근토빌딩) 5층","phone":"053-721-7079","website":"http://www.기초안전교육.com","frgEdu":"참여","status":"정상","grade":"평가면제(2년연속S)","mgmtNo":"2018_1000016792","lat":35.8399249,"lng":128.7048897},{"name":"(주)한국보건안전교육원","region":"대구·경북","address":"대구광역시 중구 명덕로 203(남산동, 우석빌딩) 2층 2층 201호","phone":"053-218-7000","website":"http://www.건설기초안전교육.com/","frgEdu":"참여","status":"정상","grade":"평가면제(2년연속S)","mgmtNo":"2016_1000004131","lat":35.8571222,"lng":128.592586},{"name":"(주)한국안전교육","region":"서울·강원","address":"서울특별시 구로구 디지털로27길 127 한영빌딩 4층 (가리봉동)","phone":"02-849-8302","website":"http://www.kocse.com","frgEdu":"참여","status":"정상","grade":"평가면제(2년연속S)","mgmtNo":"2014_1000003001","lat":37.4847099,"lng":126.8870918},{"name":"(주)건설산업안전보건교육센터","region":"서울·강원","address":"서울특별시 도봉구 노해로63길 79(창동, 우림빌딩)4층 4층 406호","phone":"02-6081-9797","website":"http://cishec.co.kr","frgEdu":"참여","status":"정상","grade":"평가면제(2년연속S)","mgmtNo":"2017_1000007529","lat":37.6531223,"lng":127.0462505},{"name":"(주)한국안전보건교육센터","region":"서울·강원","address":"서울특별시 중랑구 망우로 377(상봉동, 성환빌딩)3층 3층","phone":"02-6213-6000","website":"http://kshec.net","frgEdu":"참여","status":"정상","grade":"평가면제(2년연속S)","mgmtNo":"2017_1000008610","lat":37.5987408,"lng":127.0941056},{"name":"에스티종합안전(주)","region":"인천·경기","address":"경기도 의정부시 신흥로222번길 5-12 (의정부동)","phone":"031-826-5598","website":"http://www.sstee.co.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2013_1000002562","lat":37.7363119,"lng":127.0440324},{"name":"한국건설안전연구원(주) 평택지사","region":"경기","address":"경기도 평택시 중앙2로 13 , 203호 203호 (평택동)","phone":"031-657-6880","website":"http://한국안전.net","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2014_1000002968","lat":36.9920672,"lng":127.0885284},{"name":"(주)한국안전교육","region":"부산·경남","address":"경상남도 양산시 북정서길 22(새롬성원네오파트 상가)2층 201호","phone":"055-389-0302","website":"http://ykse.modoo.ro","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2017_1000007490","lat":35.3600048,"lng":129.0430007},{"name":"창원건설안전교육원(주)","region":"부산·경남","address":"경상남도 창원시 마산회원구 마산역광장로 30(석전동)5층 5층 501호","phone":"055-297-5556","website":"http://changwon8044.modoo.at","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2016_1000004143","lat":35.2345081,"lng":128.5782529},{"name":"주식회사 건설기초안전교육광주교육원","region":"광주·전라(제주)","address":"광주광역시 북구 하남대로 545 2층","phone":"062-464-0001","website":"http://건설기초안전교육광주교육원.com","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2019_1000022211","lat":35.174504,"lng":126.8527877},{"name":"매일안전기술원(주)","region":"광주·전라(제주)","address":"광주광역시 북구 하남대로 793 동신빌딩 2층(운암동1500)","phone":"062-531-1139","website":"http://www.shsenc.co.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2014_1000002967","lat":35.1714212,"lng":126.8794131},{"name":"(유)건설기초안전교육","region":"광주·전라(제주)","address":"광주광역시 서구 죽봉대로 37 CNS빌딩 201호","phone":"062-959-3151","website":"http://건설기초안전교육원유.com","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2019_1000029425","lat":35.1565602,"lng":126.88271},{"name":"(주)대경안전교육원","region":"대구·경북","address":"대구광역시 달서구 와룡로 133 , 3층 3층 (감삼동)","phone":"053-217-6498","website":"http://deakyeong.foredu.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2014_1000003032","lat":35.8445906,"lng":128.5366654},{"name":"건설기초안전교육협회 주식회사","region":"대전·충청","address":"대전광역시 서구 한밭대로707번길 27(월평동) 7층","phone":"042-482-0405","website":"http://www.cbsea.co.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2018_1000017895","lat":36.3591739,"lng":127.3772508},{"name":"(주)건설기초안전교육기관한국안전보건교육원","region":"대전·충청","address":"대전광역시 유성구 도안대로 591(봉명동) 308호","phone":"042-825-8992","website":"http://www.한국안전보건교육원.com","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2018_1000017834","lat":36.3531603,"lng":127.3407871},{"name":"(주)대신건설안전교육원","region":"서울·강원","address":"서울 강동구 천호대로151길 36 동서울아카데미 B1층","phone":"02-471-5555","website":"http://daesin.or.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2012_1000002252","lat":37.54059609999999,"lng":127.1235394},{"name":"(주)건설기초안전보건교육원","region":"서울·강원","address":"서울특별시 영등포구 대림로29길 42(대림동) 3층 덕산빌딩 3층","phone":"02-849-9960","website":"https://건설기초안전보건교육.com","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2016_1000004054","lat":37.49412,"lng":126.8953798},{"name":"(주)울산안전교육원","region":"부산·경남","address":"울산광역시 남구 삼산로 15 동관 5층","phone":"052-271-2228","website":"http://i-web.kr/use2228/","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2016_1000004164","lat":35.5330713,"lng":129.3095957},{"name":"건설기초안전보건교육주식회사","region":"부산·경남","address":"울산광역시 남구 삼산로 57(신정동) 4층 401호","phone":"052-988-0070","website":"http://www.ulsankorea.co.kr/","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2019_1000022202","lat":35.5341786,"lng":129.3138485},{"name":"한국건설안전연구원(주) 인천남동지사","region":"인천·경기","address":"인천광역시 남구 주안로 84 , 6층 6층 (주안동)","phone":"032-866-1998","website":"http://한국안전.net","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2016_1000004132","lat":37.4638597,"lng":126.6789292},{"name":"한국RMS(주)","region":"광주·전라(제주)","address":"전남 여수시 소라면 무선로 451 2층","phone":"061-691-5796","website":"http://www.korearms.com","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2016_1000003773","lat":34.7949141,"lng":127.6344734},{"name":"(주)우리안전기술원","region":"광주·전라(제주)","address":"전라남도 순천시 고지5길 3 (가곡동)","phone":"061-727-1135","website":"https://xn--ok0bu1tsxgkldn4bvfu3f.com/safety/","frgEdu":"미참여","status":"정상","grade":"A등급","mgmtNo":"2012_1000002238","lat":34.9833009,"lng":127.4838878},{"name":"건설기초안전교육센터 주식회사","region":"대전·충청","address":"충북 청주시 흥덕구 과상미로 3 우리은행 4층 (401호)","phone":"043-260-1553","website":"http://건설기초안전교육센터.urr.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2018_1000012966","lat":36.6434221,"lng":127.4615119},{"name":"(주)대한산업안전센터","region":"대전·충청","address":"충청남도 천안시 서북구 서부대로 371 7층","phone":"041-522-4015","website":"http://대한산업안전센터.kr","frgEdu":"참여","status":"정상","grade":"A등급","mgmtNo":"2016_1000004120","lat":36.8005249,"lng":127.1263645},{"name":"(주)한국안전보건기술원","region":"서울·강원","address":"강원도 원주시 태장공단길 46 2층 (태장농공단지관리사무소)","phone":"033-734-3902","website":"http://www.kshit.co.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2012_1000002222","lat":37.4041427,"lng":127.9468019},{"name":"한국안전보건교육센터남양주지사","region":"인천·경기","address":"경기도 남양주시 가운로1길 1 (다산동 드림프라자) 601호","phone":"031-565-9987","website":"http://kshec.net","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2023_1000032069","lat":37.6044302,"lng":127.1585248},{"name":"(주)한국산업재해연구원","region":"인천·경기","address":"경기도 부천시 소사구 경인로 253(심곡본동)3층 3층","phone":"032-651-0033","website":"http://kiai.co.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2015_1000003699","lat":37.4833475,"lng":126.7836343},{"name":"(주)한국건설안전기술교육원","region":"경기","address":"경기도 성남시 수정구 복정로 21 늘푸른빌딩 401호","phone":"031-731-9757","website":"http://kcstedu.co.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2020_1000030628","lat":37.45488599999999,"lng":127.1272223},{"name":"카이스건설기술교육(주)","region":"경기","address":"경기도 수원시 팔달구 권광로187번길 10-3 , 3층 (인계동)","phone":"031-548-0781","website":"http://www.kaisedu.com","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2014_1000003019","lat":37.2647489,"lng":127.0321651},{"name":"(주)안전교육센터","region":"경기","address":"경기도 수원시 팔달구 매산로20번길 23(매산로2가)202호 202호","phone":"031-243-9997","website":"http://건설기초안전교육센터.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2017_1000008613","lat":37.2663506,"lng":127.0033975},{"name":"주식회사 안전교육","region":"경기","address":"경기도 안산시 단원구 광덕4로 244 2층 201호 (고잔동, 천혜그레이스빌딩)","phone":"031-482-3337","website":"http://www.안전교육.com","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2016_1000004080","lat":37.3143724,"lng":126.8393573},{"name":"YH건설안전교육원(주)","region":"경기","address":"경기도 안양시 만안구 안양동 202-4 203호(동영벤처스텔)","phone":"031-468-8872","website":"http://www.yhcs.co.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2012_1000002293","lat":37.3852135,"lng":126.9357485},{"name":"건설기초안전교육 주식회사","region":"경기","address":"경기도 용인시 기흥구 강남로 7 901호","phone":"031-8067-7111","website":"http://www.yinsafety.com","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2019_1000022693","lat":37.2712963,"lng":127.1265052},{"name":"(주)김해건설안전교육원","region":"부산·경남","address":"경상남도 김해시 호계로 476 (동상동)","phone":"055-312-8555","website":"http://i-web.kr/kse8555/","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2014_1000002987","lat":35.2329966,"lng":128.8849317},{"name":"유한건설안전(주)","region":"대구·경북","address":"경상북도 구미시 형곡동로 68 (형곡동)","phone":"054-453-2460","website":"http://yuhansafety.co.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2014_1000002985","lat":36.1082581,"lng":128.3363045},{"name":"한동에이치에스이(주)","region":"대구·경북","address":"경상북도 포항시 북구 중흥로 103 4층","phone":"054-278-1122","website":"http://www.한동hse.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2013_1000002558","lat":36.0144213,"lng":129.3510299},{"name":"건설기초안전교육(주)","region":"대전·충청","address":"대전광역시 유성구 반석로 10 704호 (반석동, 반석역프라자)","phone":"042-822-4118","website":"http://www.건설기초안전교육원.com","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2014_1000002954","lat":36.3920749,"lng":127.3135177},{"name":"부산안전보건교육원(주)","region":"부산·경남","address":"부산광역시 수영구 수영로 706-6 2층","phone":"051-755-6320","website":"http://blog.naver.com/safe051","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2021_1000030687","lat":35.1674171,"lng":129.1166903},{"name":"한동에이치에스이(주) 울산터미널출장소","region":"부산·경남","address":"울산광역시 남구 달삼로84번길 8 2층(강의실), 4층(사무실)","phone":"052-265-1001","website":"http://www.한동hse.kr/","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2022_1000031777","lat":35.5361818,"lng":129.3380884},{"name":"(주)건설기초안전교육원","region":"인천·경기","address":"인천 부평구 광장로4번길 11 중보빌딩 10층","phone":"032-516-1577","website":"http://www.건설기초안전교육원.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2017_1000008612","lat":37.4906412,"lng":126.7220803},{"name":"주식회사국제평생교육원","region":"인천·경기","address":"인천광역시 미추홀구 주안로 108 5층 507호","phone":"032-428-5400","website":"https://www.평생교육.net","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2021_1000031086","lat":37.46366099999999,"lng":126.6817405},{"name":"한국건설안전연구원(주)","region":"인천·경기","address":"인천광역시 부평구 부평대로 138 (부평동)","phone":"032-515-8082","website":"http://한국안전.net","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2012_1000002245","lat":37.50378449999999,"lng":126.7220055},{"name":"한국안전보건기술(주)","region":"광주·전라(제주)","address":"전북 익산시 인북로 27 5층","phone":"063-723-2033","website":"https://ksht.dothome.co.kr","frgEdu":"참여","status":"정상","grade":"B등급","mgmtNo":"2016_1000004067","lat":35.9321455,"lng":126.9499832},{"name":"제일세이프티(주)","region":"광주·전라(제주)","address":"제주 제주시 월산남길 98-2 (노형동)","phone":"064-748-6399","website":"http://www.jeilcse.co.kr","frgEdu":"미참여","status":"정상","grade":"B등급","mgmtNo":"2019_1000029418","lat":33.4660123,"lng":126.468976},{"name":"강원건설안전(주)","region":"서울·강원","address":"강원도 강릉시 성덕포남로 183 , 3층 (포남동)","phone":"033-645-5098","website":"http://blog.naver.com/ksm248354","frgEdu":"미참여","status":"정상","grade":"C등급","mgmtNo":"2015_1000003671","lat":37.7679303,"lng":128.9085696},{"name":"주식회사건설기초안전용인교육원","region":"경기","address":"경기 용인시 처인구 용문로 142 2층 (김량장동)","phone":"031-526-6882","website":"https://yonginsafe.com","frgEdu":"참여","status":"정상","grade":"C등급","mgmtNo":"2023_1000032092","lat":37.2362137,"lng":127.2016119},{"name":"세이프21(주)","region":"경기","address":"경기도 성남시 수정구 수정로 71 , 4층 4층 (태평동, 평화빌딩)","phone":"031-759-5600","website":"http://www.safe21.net","frgEdu":"참여","status":"정상","grade":"C등급","mgmtNo":"2013_1000002565","lat":37.4400807,"lng":127.1284584},{"name":"(주)오산안전교육","region":"경기","address":"경기도 오산시 오산로 232(오산동, 남촌빌딩) 4층 2호(오산동, 남촌빌딩)","phone":"010-5675-8753","website":"http://건설기초안전교육.kr","frgEdu":"참여","status":"정상","grade":"C등급","mgmtNo":"2019_1000022493","lat":37.1475835,"lng":127.0687136},{"name":"주식회사 경기안전원","region":"경기","address":"경기도 평택시 정암로 41 (이충동), 4층","phone":"031-667-2007","website":"https://ggsafety.modoo.at/","frgEdu":"참여","status":"정상","grade":"C등급","mgmtNo":"2019_1000022203","lat":37.05695559999999,"lng":127.0584561},{"name":"한국안전관리원(주)","region":"부산·경남","address":"경남 진주시 문산읍 월아산로 1037 3층","phone":"055-758-9225","website":"http://www.ksmi.kr/","frgEdu":"미참여","status":"정상","grade":"C등급","mgmtNo":"2019_1000021622","lat":35.1640468,"lng":128.1644352},{"name":"(주)통영건설안전교육원","region":"부산·경남","address":"경상남도 통영시 무전8길 14-7 (무전동), 3층","phone":"055-648-9003","website":"https://ty009223.modoo.at/","frgEdu":"미참여","status":"정상","grade":"C등급","mgmtNo":"2017_1000011030","lat":34.859231,"lng":128.4271297},{"name":"경북안전교육원주식회사","region":"대구·경북","address":"경상북도 안동시 유곡길 133-2 ..","phone":"054-858-0487","website":"https://blog.naver.com/gbs0487","frgEdu":"참여","status":"정상","grade":"C등급","mgmtNo":"2021_1000031154","lat":36.5907922,"lng":128.6146981},{"name":"한국기초안전협회(주)","region":"광주·전라(제주)","address":"광주광역시 서구 상무민주로 119 (쌍촌동, NANA빌딩)","phone":"1600-3516","website":"http://www.건설업기초안전보건교육.com","frgEdu":"참여","status":"정상","grade":"C등급","mgmtNo":"2013_1000002730","lat":35.1612108,"lng":126.8592709},{"name":"(주)우리건설안전교육원","region":"부산·경남","address":"경상남도 창원시 의창구 사화로10번길 4 (팔용동, 상록빌딩)","phone":"055-294-7124","website":"http://cafe.naver.com/woori2947124","frgEdu":"미참여","status":"정상","grade":"D등급","mgmtNo":"2014_1000002947","lat":35.6434379,"lng":128.7444375},{"name":"한동에이치에스이(주) 안동터미널출장소","region":"대구·경북","address":"경상북도 안동시 경동로 130 2층 210호","phone":"054-854-0060","website":"http://www.한동hse.kr","frgEdu":"미참여","status":"정상","grade":"D등급","mgmtNo":"2017_1000008616","lat":36.574712,"lng":128.6759501},{"name":"주식회사산업안전보건협회","region":"광주·전라(제주)","address":"전라북도 전주시 덕진구 유상로 47 3층(팔복동2가, KT팔복지사)","phone":"063-291-7745","website":"http://산업안전보건협회.kr","frgEdu":"미참여","status":"정상","grade":"D등급","mgmtNo":"2015_1000003666","lat":35.8609109,"lng":127.0823382},{"name":"주식회사대한건설구조안전","region":"인천·경기","address":"경기 파주시 가람로116번길 107 (와동동, 운정한강듀클래스) 519호","phone":"1551-0519","website":"https://www.ikcss.co.kr","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2025_1000000002","lat":37.7324079,"lng":126.7669234},{"name":"(주)씨에스건설안전교육원","region":"경기","address":"경기도 군포시 산본천로 222 (산본동 , 세환타워) 6층","phone":"031-360-2700","website":"https://cssafety.imweb.me","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2024_1000048675","lat":37.3714075,"lng":126.9418617},{"name":"구미건설기초안전교육원(주)","region":"대구·경북","address":"경상북도 구미시 송원동로 63 (원평동 ) 2층","phone":"054-442-4242","website":"http://구미건설기초안전교육.kr","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2024_1000039071","lat":36.1223814,"lng":128.3505012},{"name":"주식회사제일안전보건교육원","region":"부산·경남","address":"부산 동래구 온천장로 5 3층,4층(온천동)","phone":"051-553-4333","website":"https://xn--z69a9pk98aw7hd2b4nmu77adg.com/","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2025_1000000001","lat":35.2127674,"lng":129.0787066},{"name":"365당산건설안전교육주식회사","region":"서울·강원","address":"서울 영등포구 당산로47길 8 (당산동6가)  제4층 제2호","phone":"070-4667-0488","website":"https://blog.naver.com/dangsan0488","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2025_1000000003","lat":37.5349363,"lng":126.9020232},{"name":"주식회사프라임건설기초안전교육원","region":"인천·경기","address":"인천광역시 부평구 동수북로 156 (부평동 , 용빌딩) 2층","phone":"032-519-2234","website":"http://primesafety.itrocks.kr/","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2025_1000000004","lat":37.4889355,"lng":126.7235611},{"name":"아산안전교육원(주)","region":"대전·충청","address":"충청남도 아산시 탕정면로 113 2층","phone":"041-533-5225","website":"http://www.asansafe.com","frgEdu":"참여","status":"정상","grade":"신규","mgmtNo":"2024_1000048625","lat":36.8019866,"lng":127.0675713}];
+
+// ─── Grade Styles ──────────────────────────────────────────────────────────
+const GRADE = {
+  '평가면제(2년연속S)': { bg:'rgba(255,199,44,0.12)', color:'#FFC72C', dot:'#FFC72C', short:'SS면제' },
+  'S등급':  { bg:'rgba(255,199,44,0.08)', color:'#E6A800', dot:'#E6A800', short:'S' },
+  'A등급':  { bg:'rgba(6,105,247,0.12)',  color:'#0669F7', dot:'#0669F7', short:'A' },
+  'B등급':  { bg:'rgba(6,105,247,0.07)',  color:'#4A9AFF', dot:'#4A9AFF', short:'B' },
+  'C등급':  { bg:'rgba(255,255,255,0.04)',color:'#5A6A8A', dot:'#5A6A8A', short:'C' },
+  'D등급':  { bg:'rgba(220,50,50,0.1)',   color:'#E05A5A', dot:'#E05A5A', short:'D' },
+  '신규':   { bg:'rgba(100,180,255,0.1)', color:'#64B4FF', dot:'#64B4FF', short:'NEW' },
+};
+
+// ─── State ─────────────────────────────────────────────────────────────────
+let map, userMarker, distCircle, infoWin;
+let userPos = null;
+let markers = [];
+let activeIndex = null;
+let filteredData = [];
+let filters = { grade:'all', frg:'all', search:'', dist:30 };
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+function haversine(lat1,lng1,lat2,lng2) {
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.asin(Math.sqrt(a));
+}
+
+function gradeBadge(grade) {
+  const g = GRADE[grade] || GRADE['C등급'];
+  return `<span class="grade-badge" style="background:${g.bg};color:${g.color}">${g.short}</span>`;
+}
+
+function markerIcon(grade, active) {
+  const g = GRADE[grade] || GRADE['C등급'];
+  const col = g.dot;
+  const sz = active ? 52 : 38;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${sz}" height="${sz+10}" viewBox="0 0 40 50">
+    <filter id="d"><feDropShadow dx="0" dy="3" stdDeviation="${active?3:2}" flood-opacity="0.5"/></filter>
+    <path d="M20 1C11.72 1 5 7.72 5 16c0 11 15 33 15 33S35 27 35 16C35 7.72 28.28 1 20 1z" fill="${col}" filter="url(#d)" opacity="${active?1:0.9}"/>
+    <circle cx="20" cy="16" r="7" fill="white" opacity="${active?0.95:0.85}"/>
+  </svg>`;
+  return {
+    url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
+    scaledSize: new google.maps.Size(sz, sz+10),
+    anchor: new google.maps.Point(sz/2, sz+10),
+  };
+}
+
+// ─── Apply filters ─────────────────────────────────────────────────────────
+function applyFilters() {
+  filteredData = INSTITUTIONS.map((inst,i) => ({
+    ...inst, _i:i,
+    dist: userPos ? haversine(userPos.lat,userPos.lng,inst.lat,inst.lng) : null,
+  })).filter(inst => {
+    if (filters.grade !== 'all' && inst.grade !== filters.grade) return false;
+    if (filters.frg   !== 'all' && inst.frgEdu !== filters.frg)  return false;
+    if (filters.search && !inst.name.includes(filters.search))    return false;
+    if (userPos && inst.dist > filters.dist)                       return false;
+    return true;
+  }).sort((a,b) => a.dist !== null ? a.dist - b.dist : 0);
+
+  renderList();
+  renderMarkers();
+  document.getElementById('resultCount').textContent = filteredData.length;
+  document.getElementById('statNearby').textContent  = userPos ? filteredData.length : '—';
+  const fbc = document.getElementById('findBtnCount');
+  if (fbc) fbc.textContent = filteredData.length;
+}
+
+// ─── Render list ───────────────────────────────────────────────────────────
+function renderList() {
+  const el = document.getElementById('resultsList');
+  if (!filteredData.length) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>조건에 맞는 기관이 없습니다</span></div>`;
+    return;
+  }
+  el.innerHTML = filteredData.map((inst,rank) => `
+    <div class="result-card ${activeIndex===inst._i?'active':''}" data-idx="${inst._i}" onclick="selectCard(${inst._i})">
+      <span class="rank">#${rank+1}</span>
+      <div class="card-top">
+        <div class="card-name">${inst.name}</div>
+        ${gradeBadge(inst.grade)}
+      </div>
+      <div class="card-meta">
+        <div class="card-row">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span style="word-break:keep-all;overflow-wrap:break-word">${inst.address}</span>
+        </div>
+        <div class="card-row">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.57a16 16 0 0 0 6.29 6.29l1.94-1.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>${inst.phone}</span>
+        </div>
+      </div>
+      ${inst.dist!==null ? `<div class="card-dist">${inst.dist.toFixed(1)} km 거리</div>` : ''}
+    </div>`).join('');
+}
+
+// ─── Render markers ────────────────────────────────────────────────────────
+function renderMarkers() {
+  markers.forEach(m => m.setMap(null));
+  markers = [];
+  const visible = new Set(filteredData.map(d => d._i));
+  INSTITUTIONS.forEach((inst,i) => {
+    const isVisible = visible.has(i);
+    const isActive  = activeIndex === i;
+    const m = new google.maps.Marker({
+      position: { lat:inst.lat, lng:inst.lng },
+      map, title:inst.name,
+      icon:    markerIcon(inst.grade, isActive),
+      opacity: isVisible ? 1 : 0.12,
+      zIndex:  isActive ? 1000 : (isVisible ? 10 : 1),
+    });
+    m.addListener('click', () => selectCard(i));
+    markers.push(m);
+  });
+}
+
+// ─── Select card ───────────────────────────────────────────────────────────
+function selectCard(idx) {
+  activeIndex = idx;
+  const inst = INSTITUTIONS[idx];
+  const dist = userPos ? haversine(userPos.lat,userPos.lng,inst.lat,inst.lng) : null;
+
+  // list sync
+  document.querySelectorAll('.result-card').forEach(c => c.classList.remove('active'));
+  const card = document.querySelector(`.result-card[data-idx="${idx}"]`);
+  if (card) { card.classList.add('active'); card.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+
+  renderMarkers();
+
+  // info window
+  if (infoWin) infoWin.close();
+  const g = GRADE[inst.grade] || GRADE['C등급'];
+  const websiteBtn = inst.website ? `<a class="info-btn secondary" href="${inst.website}" target="_blank">🌐 홈페이지</a>` : '';
+  const distBlock = dist ? `<div class="info-dist">${dist.toFixed(1)} km 거리</div>` : '';
+  const content = `<div class="info-popup">
+    <div class="info-name">${inst.name}</div>
+    <div class="info-badges">
+      <span class="info-badge" style="background:${g.bg};color:${g.color}">${inst.grade}</span>
+      <span class="info-badge" style="background:rgba(255,255,255,0.05);color:#5A6A8A">${inst.region}</span>
+      ${inst.frgEdu==='참여'?'<span class="info-badge" style="background:rgba(6,105,247,0.1);color:#4A9AFF">외국어교육</span>':''}
+    </div>
+    <div class="info-row"><span class="info-icon">📍</span><span>${inst.address}</span></div>
+    <div class="info-row"><span class="info-icon">📞</span><span>${inst.phone}</span></div>
+    ${distBlock}
+    <div class="info-actions">
+      <a class="info-btn primary" href="tel:${inst.phone}">📞 전화하기</a>
+      ${websiteBtn}
+    </div>
+    <a class="info-btn-gada" href="https://gada.worksmate.co.kr/@gada/construction_edu_rearch?ad_creative=apply&ad_group=worker&campaign=landing&content=marker&og_tag_id=423344473&routing_short_id=1smh53l&tracking_template_id=88065b9adce88bd1b72c078df12726eb&ad_type=click" target="_blank">
+      <span class="info-btn-gada-top">안전교육 수료 후 일자리를 찾고 있다면</span>
+      <div class="info-btn-gada-bottom">
+        <img class="info-btn-gada-logo" src="gada-logo.png" alt="가다">
+        <span class="info-btn-gada-text">에서 일자리 찾기 →</span>
+      </div>
+    </a>
+  </div>`;
+
+  const isMobile = window.innerWidth < 768;
+  const popupMaxW = isMobile ? Math.min(window.innerWidth - 24, 400) : 380;
+  infoWin = new google.maps.InfoWindow({ content, disableAutoPan:true, maxWidth: popupMaxW });
+  infoWin.open(map, markers[idx]);
+
+  // InfoWindow DOM 렌더 후 실제 위치 기반으로 pan
+  google.maps.event.addListenerOnce(infoWin, 'domready', () => {
+    // 잠깐 대기 후 DOM 위치 읽기 (Maps가 위치 확정 후)
+    setTimeout(() => {
+      const iw = document.querySelector('.gm-style-iw-c');
+      if (!iw) return;
+
+      const rect    = iw.getBoundingClientRect();
+      const topbarH = 64;
+      const panelW  = (window.innerWidth >= 769) ? 400 : 0;
+      const pad     = 12; // 여백
+
+      let dx = 0, dy = 0;
+
+      if (rect.top    < topbarH + pad)           dy = rect.top    - topbarH - pad;
+      if (rect.bottom > window.innerHeight - pad) dy = rect.bottom - window.innerHeight + pad;
+      if (rect.left   < panelW + pad)             dx = rect.left   - panelW  - pad;
+      if (rect.right  > window.innerWidth - pad)  dx = rect.right  - window.innerWidth  + pad;
+
+      if (dx !== 0 || dy !== 0) map.panBy(dx, dy);
+    }, 80);
+  });
+}
+
+// ─── Location state ────────────────────────────────────────────────────────
+let _watchId = null;
+let _fallbackTimer = null;
+
+function _stopWatch() {
+  if (_watchId !== null) { navigator.geolocation.clearWatch(_watchId); _watchId = null; }
+}
+function _stopTimer() {
+  if (_fallbackTimer !== null) { clearTimeout(_fallbackTimer); _fallbackTimer = null; }
+}
+function _stopAll() { _stopWatch(); _stopTimer(); }
+
+// ─── 위치 성공 처리 ─────────────────────────────────────────────────────────
+function onLocationSuccess(pos) {
+  userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+  resetBtn('위치 갱신');
+
+  const dotSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="72" height="82" viewBox="0 0 72 82">
+    <circle cx="36" cy="36" r="32" fill="rgba(6,105,247,0.12)" stroke="rgba(6,105,247,0.35)" stroke-width="1.5"/>
+    <circle cx="36" cy="36" r="20" fill="white" stroke="white" stroke-width="3"/>
+    <circle cx="36" cy="36" r="17" fill="#0669F7"/>
+    <circle cx="36" cy="36" r="6" fill="white"/>
+    <rect x="8" y="60" width="56" height="18" rx="9" fill="#0669F7"/>
+    <text x="36" y="73" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="white">내 위치</text>
+  </svg>`;
+  const dotIcon = {
+    url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(dotSvg)}`,
+    scaledSize: new google.maps.Size(72, 82),
+    anchor: new google.maps.Point(36, 36),
+  };
+  if (userMarker) {
+    userMarker.setPosition(userPos);
+    userMarker.setIcon(dotIcon);
+    userMarker.setMap(map);
+  } else {
+    userMarker = new google.maps.Marker({ position: userPos, map, title: '내 위치', zIndex: 9999, icon: dotIcon });
+  }
+
+  if (distCircle) distCircle.setMap(null);
+  drawDistCircle();
+  map.setOptions({ center: new google.maps.LatLng(userPos.lat, userPos.lng), zoom: 13 });
+  applyFilters();
+}
+
+// ─── IP 위치 폴백 ───────────────────────────────────────────────────────────
+async function useIpLocation() {
+  const services = [
+    { url:'https://ipapi.co/json/',         getLat: d => d.latitude,  getLng: d => d.longitude, ok: d => !!d.latitude },
+    { url:'https://ip-api.com/json/',       getLat: d => d.lat,       getLng: d => d.lon,       ok: d => d.status === 'success' },
+    { url:'https://freeipapi.com/api/json', getLat: d => d.latitude,  getLng: d => d.longitude, ok: d => !!d.latitude },
+  ];
+  for (const svc of services) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 5000);
+      const r = await fetch(svc.url, { signal: ctrl.signal });
+      clearTimeout(t);
+      const data = await r.json();
+      if (svc.ok(data)) {
+        onLocationSuccess({ coords: { latitude: svc.getLat(data), longitude: svc.getLng(data) } });
+        showBanner('대략적인 위치를 표시합니다. 정확한 위치는 위치 갱신을 눌러주세요.', 'info');
+        return;
+      }
+    } catch(e) { continue; }
+  }
+  resetBtn();
+  showBanner('위치를 가져올 수 없습니다. 기기 설정 > 위치 서비스를 확인해주세요.', 'error');
+}
+
+// ─── 위치 찾기 ─────────────────────────────────────────────────────────────
+function locateUser() {
+  const btn = document.getElementById('locateBtn');
+  btn.classList.add('locating');
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/></svg> 위치 파악 중...`;
+
+  if (!navigator.geolocation) {
+    resetBtn();
+    showBanner('이 브라우저는 위치 서비스를 지원하지 않습니다.', 'error');
+    return;
+  }
+
+  _stopAll(); // 이전 시도 완전 정리
+
+  // GPS watchPosition 시작 (timeout 없음 → code2/3 발생 후 자동 재시도)
+  _watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      console.log(`[GPS] 성공 lat=${pos.coords.latitude.toFixed(4)}, lng=${pos.coords.longitude.toFixed(4)}`);
+      _stopAll();
+      onLocationSuccess(pos);
+    },
+    (err) => {
+      console.log(`[GPS] 에러 code=${err.code}`);
+      if (err.code === 1) {
+        // 권한 거부 → 즉시 종료 후 안내
+        _stopAll();
+        resetBtn();
+        showBanner('위치 권한이 거부되었습니다. 브라우저 주소창의 자물쇠 아이콘 > 위치 권한을 허용해주세요.', 'error');
+      }
+      // code 2(kCLErrorLocationUnknown) / code 3(timeout): watchPosition이 자동으로 재시도
+    },
+    { enableHighAccuracy: true, maximumAge: 0 }
+  );
+
+  // 8초 후 GPS 미응답 → GPS watch 중단 후 IP 위치로 대체
+  _fallbackTimer = setTimeout(async () => {
+    _fallbackTimer = null;
+    _stopWatch(); // GPS watch 명확히 중단
+    console.log('[위치] 8초 경과 → IP 폴백');
+    await useIpLocation();
+  }, 8000);
+}
+
+function resetBtn(label='내 위치 찾기') {
+  const btn = document.getElementById('locateBtn');
+  btn.classList.remove('locating');
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="9"/></svg> ${label}`;
+}
+
+function drawDistCircle() {
+  if (!userPos) return;
+  if (distCircle) distCircle.setMap(null);
+  distCircle = new google.maps.Circle({
+    map, center:userPos, radius:filters.dist*1000,
+    fillColor:'#0669F7', fillOpacity:0.04,
+    strokeColor:'#0669F7', strokeOpacity:0.25, strokeWeight:1.5,
+  });
+}
+
+function showBanner(msg, type='error') {
+  document.getElementById('noloc-banner')?.remove();
+  const el = document.createElement('div');
+  el.id = 'noloc-banner';
+  el.className = `type-${type}`;
+  const title = type === 'error' ? '위치 오류' : '위치 안내';
+  el.innerHTML = `<div class="noloc-dot"></div><div class="noloc-text"><strong>${title}</strong>${msg}</div><button onclick="this.parentElement.classList.add('hide');setTimeout(()=>this.parentElement.remove(),300)">✕</button>`;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.classList.add('hide'); setTimeout(()=>el.remove(),300); }, 6000);
+}
+
+// ─── Filter events ─────────────────────────────────────────────────────────
+document.querySelectorAll('#gradeFilter .chip').forEach(btn =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#gradeFilter .chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); filters.grade = btn.dataset.grade; applyFilters();
+  })
+);
+document.querySelectorAll('#frgFilter .chip').forEach(btn =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#frgFilter .chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); filters.frg = btn.dataset.frg; applyFilters();
+  })
+);
+document.getElementById('searchInput').addEventListener('input', e => {
+  filters.search = e.target.value.trim(); applyFilters();
+});
+const slider = document.getElementById('distSlider');
+slider.addEventListener('input', () => {
+  filters.dist = +slider.value;
+  document.getElementById('distVal').textContent = `${filters.dist} km`;
+  const pct = ((filters.dist-1)/99*100).toFixed(1);
+  slider.style.setProperty('--pct', `${pct}%`);
+  drawDistCircle(); applyFilters();
+});
+slider.style.setProperty('--pct','29.3%');
+// ─── Panel open/close ──────────────────────────────────────────────────────
+function openPanel() {
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('panelBackdrop').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('panelBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('locateBtn').addEventListener('click', () => {
+  // 이미 동의했거나 위치 갱신 중이면 바로 실행
+  if (localStorage.getItem('loc_consent') === '1' || userPos) {
+    locateUser();
+  } else {
+    document.getElementById('locConsent').classList.add('show');
+  }
+});
+document.getElementById('lcAllow').addEventListener('click', () => {
+  localStorage.setItem('loc_consent', '1');
+  document.getElementById('locConsent').classList.remove('show');
+  locateUser();
+});
+document.getElementById('lcDeny').addEventListener('click', () => {
+  document.getElementById('locConsent').classList.remove('show');
+});
+document.getElementById('menuToggle')?.addEventListener('click', openPanel);
+
+// ─── Map init ──────────────────────────────────────────────────────────────
+window.initMap = function() {
+  const koreaBounds = new google.maps.LatLngBounds(
+    { lat:32.0, lng:123.0 },
+    { lat:43.5, lng:133.5 }
+  );
+  map = new google.maps.Map(document.getElementById('map'), {
+    center:{ lat:36.0, lng:127.7 }, zoom:8,
+    gestureHandling:'greedy',
+    restriction:{ latLngBounds:koreaBounds, strictBounds:false },
+    minZoom:6,
+  });
+
+  map.addListener('click', () => {
+    if (infoWin) infoWin.close();
+    activeIndex = null;
+    document.querySelectorAll('.result-card').forEach(c=>c.classList.remove('active'));
+    renderMarkers();
+  });
+
+  applyFilters();
+
+  setTimeout(() => {
+    const ov = document.getElementById('loadingOverlay');
+    ov.style.opacity = '0';
+    setTimeout(() => ov.remove(), 500);
+  }, 2000);
+};
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBA0QSmBP8r5rV6vEI3CZlnpwwGZ0F21LY&language=ko&callback=initMap"></script>
+</body>
+</html>
